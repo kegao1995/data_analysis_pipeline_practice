@@ -1,66 +1,61 @@
-# Default target: Generate everything including the report
-.PHONY: all clean
+.PHONY: clean
 
-all: results/figure/isles.png \
-    results/figure/abyss.png \
-    results/figure/last.png \
-    results/figure/sierra.png \
-	report/count_report.html
+all: report/count_report.html report/count_report_files
 
-# Rule to count words
-results/isles.dat: data/isles.txt
+# Count the words
+results/isles.dat: scripts/wordcount.py data/isles.txt 
 	python scripts/wordcount.py \
-	    --input_file=data/isles.txt \
-	    --output_file=results/isles.dat
+    	--input_file=data/isles.txt \
+    	--output_file=results/isles.dat
 
-results/abyss.dat: data/abyss.txt
+results/abyss.dat: scripts/wordcount.py data/abyss.txt
 	python scripts/wordcount.py \
 	    --input_file=data/abyss.txt \
 	    --output_file=results/abyss.dat
 
-results/last.dat: data/last.txt
+results/last.dat: scripts/wordcount.py data/last.txt
 	python scripts/wordcount.py \
 	    --input_file=data/last.txt \
 	    --output_file=results/last.dat
 
-results/sierra.dat: data/sierra.txt
+results/sierra.dat: scripts/wordcount.py data/sierra.txt
 	python scripts/wordcount.py \
 	    --input_file=data/sierra.txt \
 	    --output_file=results/sierra.dat
 
-# Rule to create plots
-results/figure/isles.png: results/isles.dat
+# make the plots
+results/figure/isles.png: scripts/plotcount.py results/isles.dat
 	python scripts/plotcount.py \
 	    --input_file=results/isles.dat \
 	    --output_file=results/figure/isles.png
 
-results/figure/abyss.png: results/abyss.dat
+results/figure/abyss.png: scripts/plotcount.py results/abyss.dat
 	python scripts/plotcount.py \
 	    --input_file=results/abyss.dat \
 	    --output_file=results/figure/abyss.png
 
-results/figure/last.png: results/last.dat
+results/figure/last.png: scripts/plotcount.py results/last.dat
 	python scripts/plotcount.py \
 	    --input_file=results/last.dat \
 	    --output_file=results/figure/last.png
 
-results/figure/sierra.png: results/sierra.dat
+results/figure/sierra.png: scripts/plotcount.py results/sierra.dat
 	python scripts/plotcount.py \
 	    --input_file=results/sierra.dat \
 	    --output_file=results/figure/sierra.png
 
-report/count_report.html: report/count_report.qmd
+# Renders a report
+report/count_report.html report/count_report_files: results/figure/isles.png results/figure/abyss.png results/figure/last.png results/figure/sierra.png
 	quarto render report/count_report.qmd
 
-# Clean up generated files
 clean:
-	rm -f \
-	    results/isles.dat \
-	    results/abyss.dat \
-	    results/last.dat \
-	    results/sierra.dat \
-	    results/figure/isles.png \
-	    results/figure/abyss.png \
-	    results/figure/last.png \
-	    results/figure/sierra.png \
-        report/count_report.html
+	rm -f results/isles.dat \
+		results/abyss.dat \
+		results/last.dat \
+		results/sierra.dat
+	rm -f results/figure/isles.png \
+		results/figure/abyss.png \
+		results/figure/last.png \
+		results/figure/sierra.png	
+	rm -rf report/count_report.html \
+		report/count_report_files
